@@ -23,11 +23,14 @@ class Migration(migrations.Migration):
             name='Producto',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('nombre', models.CharField(max_length=50)),
-                ('descripcion', models.CharField(max_length=50)),
+                ('nombre', models.CharField(max_length=100)),
+                ('descripcion', models.CharField(max_length=150)),
+                ('categorias', models.TextField(blank=True, null=True)),
                 ('precio', models.FloatField()),
-                ('talla', models.CharField(max_length=50)),
-                ('imagen', models.ImageField(blank=True, null=True, upload_to='productos')),
+                ('stock', models.IntegerField()),
+                ('talla', models.TextField(blank=True, null=True)),
+                ('imagen', models.TextField(blank=True, null=True)),
+
             ],
         ),
         migrations.CreateModel(

@@ -6,9 +6,10 @@ urlpatterns = [
     path('usuarios', views.get_users, name='get users'),
     path('register', views.create_user, name='create new user'),
     path('login',views.login, name='login'),
-    path('producto', views.create_product, name='create product'),
-    path('productos', views.list_products, name='create product'),
-    
+    path('crearProducto', views.create_product, name='create product'),
+    path('productos', views.list_products, name='get list of all products'),
+    path('producto', views.product_by_id, name='view product by id'),
+
     path('categoria', views.create_category, name='create category'),
     path('categorias', views.get_categories, name='get categories'),
     #listos los roles

@@ -130,6 +130,8 @@ def register(request):
     return JsonResponse({'error': 'Invalid request method'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 #FUNCIONA
+@csrf_exempt 
+@api_view(['GET'])
 def list_products(request):
     if request.method == 'GET':
         products = Producto.objects.all()
@@ -138,6 +140,23 @@ def list_products(request):
         print('\nResponse after parsing : ',serializer.data)
         return JsonResponse(serializer.data, safe=False)
     return HttpResponse("No hay productos")
+
+
+@csrf_exempt 
+@api_view(['POST'])
+def product_by_id(request):
+    if request.method == 'POST':
+        product_id = request.data.get('id', None)  # Assuming 'id' is the attribute containing the product ID
+        if product_id is not None:
+            try:
+                product = Producto.objects.get(id=product_id)
+                serializer = ProductoSerializer(product)
+                return JsonResponse(serializer.data)
+            except Producto.DoesNotExist:
+                return JsonResponse({'error': 'Product not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'ID attribute not provided in the request'}, status=400)
+    return HttpResponse("Incorrect request method")
 
 
 def send_email(request):
