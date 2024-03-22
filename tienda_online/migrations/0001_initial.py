@@ -83,6 +83,16 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('cantidad', models.IntegerField()),
+                ('producto', models.CharField(max_length=50)),
+                ('usuario', models.CharField(max_length=50)),
+                ('estado', models.CharField(max_length=50)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Despacho',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('cantidad', models.IntegerField()),
                 ('producto', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tienda_online.producto')),
                 ('usuario', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='tienda_online.usuario')),
             ],

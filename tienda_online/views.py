@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.middleware.csrf import get_token
 from rest_framework.parsers import JSONParser
 from tienda_online.models import Usuario,Producto,Categoria, Rol,Compra,Comentario,Puntuacion,Pregunta,Respuesta
-from tienda_online.serializers import ProductoSerializer,UsuarioSerializer, CategoriaSerializer, RolSerializer
+from tienda_online.serializers import ProductoSerializer,UsuarioSerializer, CategoriaSerializer, RolSerializer, CompraSerializer
 from django.core import serializers
 # from django.contrib.auth.forms import UserCreationForm
 from django.template.loader import get_template
@@ -158,10 +158,33 @@ def product_by_id(request):
             return JsonResponse({'error': 'ID attribute not provided in the request'}, status=400)
     return HttpResponse("Incorrect request method")
 
-
+@csrf_exempt 
+@api_view(['POST'])
 def send_email(request):
-    email = 'miguel.rovlich@sansano.usm.cl'
+    email = 'danielmorales@gmail.com'
 
+    # Assuming 'user_id' and 'some_data' are required for the register
+    user_id = request.data.get('usuario')
+    some_data = request.data.get('basket')
+    subtotal = request.data.get('subtotal')
+    payment = request.data.get('payment')
+    shipping = request.data.get('shipping')
+
+
+
+    if user_id is not None and some_data is not None:
+        try:
+            user = Usuario.objects.get(id=user_id)
+            registro = Compra.objects.create(user=user_id, producto=some_data, cantidad=subtotal, estado='Procesando')
+            registro_serializer = CompraSerializer(registro)
+        except Usuario.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    else:
+        return JsonResponse({'error': 'User ID or data not provided'}, status=400)
+
+    # Send email
     template = get_template('email-order.html')
     content = template.render({'email': email})
 
@@ -173,4 +196,5 @@ def send_email(request):
     )
     email.attach_alternative(content, 'text/html')
     email.send()
-    return HttpResponse("Email enviado")
+
+    return HttpResponse("Email sent and register added successfully")

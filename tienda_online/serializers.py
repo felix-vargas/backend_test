@@ -38,3 +38,9 @@ class RespuestaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Respuesta
         fields = '__all__'
+
+
+class CompraSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Compra
+        fields = '__all__'
