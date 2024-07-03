@@ -144,6 +144,38 @@ def list_products(request):
 
 @csrf_exempt 
 @api_view(['POST'])
+def compra(request):
+    if request.method == 'POST':
+        basket = request.data.get('basket', [])
+        for item in basket:
+            print(item)
+            try:
+                product_id = item['id']
+                selected_size = item['selectedSize']
+                product = Producto.objects.get(id=product_id)
+                if selected_size == 'S':
+                    product.stock_s = max(0, product.stock_s - 1)
+                elif selected_size == 'M':
+                    product.stock_m = max(0, product.stock_m - 1)
+                elif selected_size == 'L':
+                    product.stock_l = max(0, product.stock_l - 1)
+                elif selected_size == 'XL':
+                    product.stock_xl = max(0, product.stock_xl - 1)
+                else:
+                    return JsonResponse({'error': f'Invalid size {selected_size}'}, status=400)
+                
+                product.save()
+            except Producto.DoesNotExist:
+                return JsonResponse({'error': f'Product with id {product_id} does not exist'}, status=404)
+            except KeyError:
+                return JsonResponse({'error': 'Invalid basket format, missing "id" or "selectedSize" key'}, status=400)
+        
+        return JsonResponse('GAMER', safe=False)
+    return HttpResponse("Solicitud incorrecta")
+
+
+@csrf_exempt 
+@api_view(['POST'])
 def product_by_id(request):
     if request.method == 'POST':
         product_id = request.data.get('id', None)  # Assuming 'id' is the attribute containing the product ID

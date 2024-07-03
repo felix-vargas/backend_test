@@ -27,7 +27,10 @@ class Migration(migrations.Migration):
                 ('descripcion', models.CharField(max_length=150)),
                 ('categorias', models.TextField(blank=True, null=True)),
                 ('precio', models.FloatField()),
-                ('stock', models.IntegerField()),
+                ('stock_s', models.IntegerField()),
+                ('stock_m', models.IntegerField()),
+                ('stock_l', models.IntegerField()),
+                ('stock_xl', models.IntegerField()),
                 ('talla', models.TextField(blank=True, null=True)),
                 ('imagen', models.TextField(blank=True, null=True)),
 

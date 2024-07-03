@@ -28,10 +28,12 @@ class Categoria(models.Model):
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=50)
-    descripcion = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=500)
     precio = models.FloatField()
-    talla = models.CharField(max_length=50)
-    # categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    stock_s = models.IntegerField()
+    stock_m = models.IntegerField()
+    stock_l = models.IntegerField()
+    stock_xl =models.IntegerField()
     imagen = models.ImageField(upload_to='productos', null=True, blank=True)
     def __str__(self):
         return self.nombre

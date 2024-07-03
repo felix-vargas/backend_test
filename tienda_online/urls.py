@@ -15,6 +15,6 @@ urlpatterns = [
     #listos los roles
     path('rol', views.create_rol, name='create rol'),
     path('roles', views.get_roles, name='get roles'),
-    path('compra', views.send_email, name='compra'),
+    path('purchase', views.compra, name='compra'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
