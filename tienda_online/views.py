@@ -148,22 +148,24 @@ def compra(request):
     if request.method == 'POST':
         basket = request.data.get('basket', [])
         for item in basket:
-            print(item)
             try:
                 product_id = item['id']
                 selected_size = item['selectedSize']
                 product = Producto.objects.get(id=product_id)
                 if selected_size == 'S':
                     product.stock_s = max(0, product.stock_s - 1)
+                    print("\nPRODUCTO COMPRADO TALLA S",product.stock_s)
                 elif selected_size == 'M':
                     product.stock_m = max(0, product.stock_m - 1)
+                    print("\nPRODUCTO COMPRADO TALLA M",product.stock_m)
                 elif selected_size == 'L':
                     product.stock_l = max(0, product.stock_l - 1)
+                    print("\nPRODUCTO COMPRADO TALLA L",product.stock_l)
                 elif selected_size == 'XL':
                     product.stock_xl = max(0, product.stock_xl - 1)
+                    print("\nPRODUCTO COMPRADO TALLA XL",product.stock_xl)
                 else:
                     return JsonResponse({'error': f'Invalid size {selected_size}'}, status=400)
-                
                 product.save()
             except Producto.DoesNotExist:
                 return JsonResponse({'error': f'Product with id {product_id} does not exist'}, status=404)

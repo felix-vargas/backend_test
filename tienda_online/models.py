@@ -34,6 +34,7 @@ class Producto(models.Model):
     stock_m = models.IntegerField()
     stock_l = models.IntegerField()
     stock_xl =models.IntegerField()
+    talla = models.CharField(max_length=50)
     imagen = models.ImageField(upload_to='productos', null=True, blank=True)
     def __str__(self):
         return self.nombre
