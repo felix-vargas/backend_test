@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('stock_l', models.IntegerField()),
                 ('stock_xl', models.IntegerField()),
                 ('talla', models.TextField(blank=True)),
-                ('imagen', models.TextField(blank=True, null=True)),
+                ('imagen', models.CharField(max_length=500)),
 
             ],
         ),

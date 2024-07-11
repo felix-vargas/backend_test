@@ -16,6 +16,11 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+
+import base64
+import os
 
 def get_users(request):
     if request.method == 'GET':
@@ -26,20 +31,56 @@ def get_users(request):
         return JsonResponse(serializer.data, safe=False)
     return HttpResponse("No hay productos")
 
-
+def save_product_with_image(data,name):
+    try:
+        image_data = data['nuevo_producto']['imagen_data']['url']
+        format, imgstr = image_data.split(';base64,')
+        ext = format.split('/')[-1]
+        
+        # Generate a unique file name for the image
+        image_name = name  # You can generate a more meaningful name
+        
+        # Decode the base64 data
+        image_data = base64.b64decode(imgstr)
+        
+        # Save the image to the media directory
+        default_storage.save(os.path.join(image_name), ContentFile(image_data))
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error saving product: {e}")
+        return None
 
 @csrf_exempt 
 @api_view(['POST'])
 def create_product(request):
     if request.method == 'POST':
         data = request.data
-        serializer = ProductoSerializer(data=data)
+        save_product_with_image(data,data['nuevo_producto']['imagen'])
+        del data['nuevo_producto']['imagen_data']
+        print(data['nuevo_producto'])
+        serializer = ProductoSerializer(data=data['nuevo_producto'])
+        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     return Response("No hay productos", status=status.HTTP_400_BAD_REQUEST)
+
+@csrf_exempt 
+@api_view(['POST'])
+def delete_product(request):
+    try:
+        print(request.data)
+        product_id = request.data.get('id', None)  # Assuming 'id' is the attribute containing the product ID
+        product = Producto.objects.get(id=product_id)
+    except Producto.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    product.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 #funcionando
@@ -136,7 +177,15 @@ def list_products(request):
     if request.method == 'GET':
         products = Producto.objects.all()
         print('\nProductos : ',products)
-        serializer = ProductoSerializer(products, many=True)
+        serializer = ProductoSerializer(products, many=True, context={'request': request})
+        print('\nResponse after parsing : ',serializer.data)
+        for item in serializer.data:
+            print(item)
+            if 'imagen' in item:
+                if('/media' in item['imagen']):
+                    item['imagen'] = item['imagen'].replace('/media/', '/api/media/')
+                else:
+                    item['imagen'] = 'http://localhost:8000/api/media/'+item['imagen']
         print('\nResponse after parsing : ',serializer.data)
         return JsonResponse(serializer.data, safe=False)
     return HttpResponse("No hay productos")
@@ -184,8 +233,16 @@ def product_by_id(request):
         if product_id is not None:
             try:
                 product = Producto.objects.get(id=product_id)
-                serializer = ProductoSerializer(product)
-                return JsonResponse(serializer.data)
+                serializer = ProductoSerializer(product, context={'request': request})
+                serializer = serializer.data
+                print(serializer)
+                if('/media/' in serializer['imagen']):
+                    serializer['imagen'] = serializer['imagen'].replace('/media/', '/api/media/')
+                else:
+                    serializer['imagen'] = 'http://localhost:8000/api/media/'+serializer['imagen']
+
+                print(serializer)
+                return JsonResponse(serializer)
             except Producto.DoesNotExist:
                 return JsonResponse({'error': 'Product not found'}, status=404)
         else:

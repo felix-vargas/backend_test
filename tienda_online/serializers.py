@@ -10,6 +10,13 @@ class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
         fields = '__all__'
+    def get_imagen_url(self, obj):
+        request = self.context.get('request')
+        base_url = request.build_absolute_uri('/').rstrip('/')
+        api_prefix = '/api'
+        if obj.imagen:
+            return f'{base_url}{api_prefix}{obj.imagen}'
+        return None
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Categoria
